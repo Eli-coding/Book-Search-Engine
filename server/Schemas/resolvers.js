@@ -3,7 +3,7 @@ const { signToken } = require("../utils/auth");
 
 const resolvers = {
   Query: {
-    getSingleUser: async (parent, args, context) => {
+     me: async (parent, args, context) => {
       const foundUser = await User.findOne({
         _id: context.user._id,
       });
@@ -11,7 +11,7 @@ const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (parent, args) => {
+    addUser: async (parent, args) => {
       const user = await User.create(args);
       const token = signToken(user);
       return { token, user };
@@ -21,22 +21,24 @@ const resolvers = {
       if (!User) {
         throw new AuthenticationError("Can't find this user.");
       }
-      const correctPw = await User.isCorrectPassword(password);
+      const correctPw = await User.isCorrectPassword({password});
       if (!correctPW) {
         throw new AuthenticationError("Wrong password");
       }
       const token = signToken(user);
       return { token, user };
     },
+
     saveBook: async (parent, { savedBook }, context) => {
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
-        { $addToSet: { savedBook: body } },
+        { $addToSet: { savedBooks: savedBook } },
         { new: true, runValidators: true }
       );
       return { updatedUser };
     },
-    deleteBook: async (parent, args, context) => {
+
+    removeBook: async (parent, args, context) => {
       const updatedUser = await User.findOneAndUpdate(
         { _id: user._id },
         { $pull: { savedBooks: { bookId: params.bookId } } },
