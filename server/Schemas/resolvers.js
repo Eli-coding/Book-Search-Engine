@@ -21,7 +21,7 @@ const resolvers = {
       if (!User) {
         throw new AuthenticationError("Can't find this user.");
       }
-      const correctPw = await User.isCorrectPassword({password});
+      const correctPw = await user.isCorrectPassword({password});
       if (!correctPW) {
         throw new AuthenticationError("Wrong password");
       }
